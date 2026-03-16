@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halyo - Hope Finds a Way</title>
+    <link rel="stylesheet" href="/static/no-match.css">
+</head>
+<body>
+    <div class="stars-container">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+    
+    <div class="radial-gradient"></div>
+    
+    <main class="no-match-container">
+        <div class="content-card">
+            <div class="eclipse-visual">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-eclipse">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <radialGradient id="eclipseGradient">
+                            <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0f0f1a;stop-opacity:1" />
+                        </radialGradient>
+                    </defs>
+                    
+                    <circle cx="100" cy="100" r="70" fill="url(#eclipseGradient)" />
+                    <circle 
+                        class="eclipse-ring-animated" 
+                        cx="100" 
+                        cy="100" 
+                        r="70" 
+                        fill="none" 
+                        stroke="#ff7eb9" 
+                        stroke-width="2" 
+                        filter="url(#glow-eclipse)"
+                    />
+                </svg>
+            </div>
+            
+            <h1 class="main-title">Un moment pour soi</h1>
+            
+            <div class="poetry-text">
+                <p>Mettre des mots sur ses émotions est déjà une immense victoire.</p>
+            </div>
+            
+            <div class="comfort-message">
+                <div class="message-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ff7eb9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+                    </svg>
+                </div>
+                <p>Chaque parcours est unique. Pour l'instant, personne ne vie exactement la même chose que toi, mais tu n'es pas seul.</p>
+            </div>
+            
+            <div class="action-options">
+                <button class="option-button primary" id="refineBtn">
+                    <span>Refine your words</span>
+                    <div class="button-glow"></div>
+                </button>
+                
+                <button class="option-button secondary" id="talkToAiBtn">
+                    <span>Talk to Halyo (AI)</span>
+                    <div class="button-glow"></div>
+                </button>
+            </div>
+            
+            <div class="alternative-info">
+                <p>Halyo's AI can listen and provide comfort while you wait for a human connection</p>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/static/no-match.js"></script>
+</body>
+</html>

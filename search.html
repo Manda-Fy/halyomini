@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halyo - Tell your story</title>
+    <link rel="stylesheet" href="/static/search.css">
+</head>
+<body>
+    <div class="stars-container">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+    
+    <div class="radial-gradient"></div>
+    
+    <main class="search-container">
+        <div class="logo-small">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <filter id="glow-small">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <circle cx="30" cy="30" r="24" fill="#1a1a2e" />
+                <circle cx="30" cy="30" r="24" fill="none" stroke="#ff7eb9" stroke-width="1.5" filter="url(#glow-small)" />
+            </svg>
+        </div>
+        
+        <div class="form-card">
+            <h1 class="page-title">Raconter votre histoire</h1>
+            <p class="page-subtitle">Qu'est ce qui ne va pas?</p>
+            
+            <form id="storyForm" class="story-form">
+                <div class="input-group">
+                    <label for="pseudo">Comment devons Nous vous appeler?</label>
+                    <input 
+                        type="text" 
+                        id="pseudo" 
+                        name="pseudo" 
+                        placeholder="Votre Pseudonyme" 
+                        required
+                        maxlength="20"
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="story">Dite ce que vous avez sur le coeur.</label>
+                    <textarea 
+                        id="story" 
+                        name="story" 
+                        placeholder="Prenez votre temps, Personne ne vous juge ici ..."
+                        required
+                        rows="8"
+                    ></textarea>
+                    <span class="char-count">0 / 1000</span>
+                </div>
+                
+                <button type="submit" class="submit-button">
+                    <span>Rechercher une correspondance.</span>
+                    <div class="button-glow"></div>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Modal de progression -->
+        <div class="progress-modal" id="progressModal">
+            <div class="progress-content">
+                <div class="progress-icon">
+                    <svg class="listening-animation" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="35" fill="none" stroke="#ff7eb9" stroke-width="2" opacity="0.3" />
+                        <circle class="progress-circle" cx="50" cy="50" r="35" fill="none" stroke="#ff7eb9" stroke-width="2" />
+                    </svg>
+                </div>
+                <h2 class="progress-title">Un moment ...</h2>
+                <p class="progress-text">Halyo cherche une correspondance.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/static/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halyo - Safe Space</title>
+    <link rel="stylesheet" href="/static/chat.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js">
+</head>
+<body>
+    <div class="stars-container">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+    
+    <div class="radial-gradient"></div>
+    
+    <main class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="connection-info">
+                <div class="status-indicator"></div>
+                <div class="header-text">
+                    <h2 id="chatPartnerName">Halyo AI</h2>
+                    <span class="status-text" id="statusText">Listening with empathy</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="header-button" id="endChatBtn" title="End conversation">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Messages area -->
+        <div class="messages-wrapper">
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="30" cy="30" r="24" fill="#1a1a2e" />
+                            <circle cx="30" cy="30" r="24" fill="none" stroke="#ff7eb9" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <p id="welcomeText">This is a safe space. Everything shared here stays between us.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Typing indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+        
+        <!-- Input area -->
+        <div class="input-area">
+            <form class="message-form" id="messageForm">
+                <textarea 
+                    id="messageInput" 
+                    placeholder="Share what's on your mind..."
+                    rows="1"
+                ></textarea>
+                <button type="submit" class="send-button" id="sendButton">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </main>
+    
+    <script src="/static/chat.js"></script>
+</body>
+</html>

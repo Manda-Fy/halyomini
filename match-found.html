@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halyo - Match Found</title>
+    <link rel="stylesheet" href="/static/match-found.css">
+</head>
+<body>
+    <div class="particles-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <div class="radial-gradient"></div>
+    
+    <main class="match-container">
+        <div class="match-content">
+            <div class="eclipse-visual">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-eclipse">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <radialGradient id="eclipseGradient">
+                            <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0f0f1a;stop-opacity:1" />
+                        </radialGradient>
+                    </defs>
+                    
+                    <circle cx="100" cy="100" r="70" fill="url(#eclipseGradient)" />
+                    <circle 
+                        class="eclipse-ring-animated" 
+                        cx="100" 
+                        cy="100" 
+                        r="70" 
+                        fill="none" 
+                        stroke="#ff7eb9" 
+                        stroke-width="2" 
+                        filter="url(#glow-eclipse)"
+                    />
+                </svg>
+            </div>
+            
+            <h1 class="match-title">RÉSONANCE TROUVÉE</h1>
+            <p class="match-subtitle">Quelqu'un qui te comprendra t'attend.</p>
+            
+            <div class="match-info">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#ff7eb9" opacity="0.3"/>
+                        </svg>
+                    </div>
+                    <h3>Connection</h3>
+                    <p>Cette personne traverse un chemin bien similaire au tien.</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" fill="#ff7eb9" opacity="0.3"/>
+                        </svg>
+                    </div>
+                    <h3>Anonymat Complet</h3>
+                    <p>Votre conversation est anonyme et éphémère.</p>
+                </div>
+            </div>
+            
+            <div class="waiting-notice" id="waitingNotice">
+                <div class="waiting-icon">
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring"></div>
+                </div>
+                <p></p>
+            </div>
+            
+            <div class="action-buttons" id="actionButtons" style="display: none;">
+                <button class="action-button primary" id="chatNowBtn">
+                    <span>Échanger avec elle.</span>
+                    <div class="button-glow"></div>
+                </button>
+                
+                <button class="action-button secondary" id="talkToAiBtn">
+                    <span>Parler à Halyo (AI)</span>
+                    <div class="button-glow"></div>
+                </button>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Toast notification -->
+    <div class="toast-notification" id="toastNotification">
+        <div class="toast-icon">✓</div>
+        <div class="toast-content">
+            <h4>Connection Possible.</h4>
+            <p>La personne est prête à vous parler</p>
+        </div>
+    </div>
+    
+    <script src="/static/match-found.js"></script>
+</body>
+</html>

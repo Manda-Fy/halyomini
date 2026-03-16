@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0a0a0c;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+.logo-container {
+    position: relative;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.eclipse-logo {
+    width: 300px;
+    height: 300px;
+    filter: drop-shadow(0 0 40px rgba(255, 126, 185, 0.3));
+}
+
+.eclipse-ring {
+    animation: pulse 2.5s ease-in-out infinite;
+}
+
+/* Animation du tracé du cercle */
+@keyframes drawCircle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Animation de pulsation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.8;
+        filter: drop-shadow(0 0 10px rgba(255, 126, 185, 0.6));
+    }
+    50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 25px rgba(255, 126, 185, 0.9));
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .eclipse-logo {
+        width: 250px;
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .eclipse-logo {
+        width: 200px;
+        height: 200px;
+    }
+}
