@@ -6,8 +6,10 @@
     <title>Halyo - Safe Space</title>
     <link rel="stylesheet" href="/static/chat.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js">
-</head>
+    </script>
+    </head>
 <body>
+    
     <div class="stars-container">
         <div class="star"></div>
         <div class="star"></div>
@@ -38,7 +40,7 @@
             </div>
         </div>
         
-        <!-- Messages area -->
+      
         <div class="messages-wrapper">
             <div class="messages-container" id="messagesContainer">
                 <div class="welcome-message">
@@ -52,15 +54,13 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Typing indicator -->
+         
         <div class="typing-indicator" id="typingIndicator">
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
         </div>
-        
-        <!-- Input area -->
+
         <div class="input-area">
             <form class="message-form" id="messageForm">
                 <textarea 

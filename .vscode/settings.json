@@ -1,0 +1,8 @@
+{
+    "liveServer.settings.root": "/",
+    "liveServer.settings.mount": [],
+    "liveServer.settings.proxy": {
+        "proxyUri": "http://127.0.0.1:5000"
+    },
+    "liveServer.settings.file": "/home.html"
+}
