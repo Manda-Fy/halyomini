@@ -70,6 +70,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const data = await res.json();
 
+            // Sauvegarder le code de récupération
+            if (data.recovery_code) {
+                localStorage.setItem('halyo_recovery_code', data.recovery_code);
+                localStorage.setItem('halyo_token', data.token);
+                localStorage.setItem('halyo_profile_id', data.new_profile_id);
+                if (data.room_id) {
+                    localStorage.setItem('halyo_room_id', data.room_id);
+                }
+            }
+
             progressModal.classList.remove('active');
 
             const params = new URLSearchParams({

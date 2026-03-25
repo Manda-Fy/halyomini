@@ -1,184 +1,213 @@
-const configRes = await fetch("/config");
-const config = await configRes.json();
-const API_BASE = config.api_base;
+// Variables globales
+var API_BASE;
+var roomId;
+var myPseudo;
+var matchPseudo;
+var token;
+var messagesContainer;
+var messageInput;
+var typingIndicator;
+var socket;
 
-const params      = new URLSearchParams(window.location.search);
-const roomId      = params.get("room_id");
-const myPseudo    = params.get("your_pseudo");
-const matchPseudo = params.get("match_pseudo");
-const token       = sessionStorage.getItem("halyo_token");
+// Initialisation asynchrone
+(async function init() {
+    var configRes = await fetch("/config");
+    var config = await configRes.json();
+    API_BASE = config.api_base;
 
-// Redirige si les infos sont manquantes
-if (!token || !roomId || !myPseudo) {
-    window.location.href = "index.html";
-}
+    var params = new URLSearchParams(window.location.search);
+    roomId = params.get("room_id");
+    myPseudo = params.get("your_pseudo");
+    matchPseudo = params.get("match_pseudo");
+    token = sessionStorage.getItem("halyo_token");
 
-// Mise à jour du header avec le pseudo du match
-document.getElementById("chatPartnerName").textContent = matchPseudo || "Halyo";
-document.getElementById("statusText").textContent = "Connecté";
+    // Sauvegarder les infos de conversation dans localStorage
+    var conversationKey = "halyo_conv_" + roomId;
+    localStorage.setItem(conversationKey, JSON.stringify({
+        roomId: roomId,
+        myPseudo: myPseudo,
+        matchPseudo: matchPseudo,
+        token: token
+    }));
 
-const messagesContainer = document.getElementById("messagesContainer");
-const messageInput      = document.getElementById("messageInput");
-const typingIndicator   = document.getElementById("typingIndicator");
-
-// Connexion WebSocket
-const socket = io(API_BASE);
-
-socket.on("connect", () => {
-    socket.emit("join", { room_id: roomId, token: token });
-    document.getElementById("statusText").textContent = "En ligne";
-    loadHistory();
-});
-
-socket.on("disconnect", () => {
-    document.getElementById("statusText").textContent = "Déconnecté";
-});
-
-socket.on("message", (data) => {
-    cacherIndicateurEcriture();
-    afficherMessage(data.pseudo, data.content, data.created_at);
-});
-
-socket.on("status", (data) => {
-    afficherStatut(data.message);
-});
-
-socket.on("error", (data) => {
-    console.error("Erreur :", data.message);
-    if (data.message === "Token invalide") {
+    if (!token || !roomId || !myPseudo) {
         window.location.href = "index.html";
+        return;
     }
-});
 
-// Indicateur de frappe
-let typingTimeout;
-socket.on("typing", (data) => {
-    if (data.pseudo !== myPseudo) {
-        afficherIndicateurEcriture();
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(cacherIndicateurEcriture, 2000);
+    document.getElementById("chatPartnerName").textContent = matchPseudo || "Halyo";
+    document.getElementById("statusText").textContent = "Connecte";
+
+    messagesContainer = document.getElementById("messagesContainer");
+    messageInput = document.getElementById("messageInput");
+    typingIndicator = document.getElementById("typingIndicator");
+
+    socket = io(API_BASE);
+
+    socket.on("connect", function() {
+        socket.emit("join", { room_id: roomId, token: token });
+        document.getElementById("statusText").textContent = "En ligne";
+        loadHistory();
+    });
+
+    socket.on("disconnect", function() {
+        document.getElementById("statusText").textContent = "Deconnecte";
+    });
+
+    socket.on("message", function(data) {
+        cacherIndicateurEcriture();
+        afficherMessage(data.pseudo, data.content, data.created_at);
+    });
+
+    socket.on("status", function(data) {
+        afficherStatut(data.message);
+    });
+
+    socket.on("error", function(data) {
+        console.error("Erreur :", data.message);
+        if (data.message === "Token invalide") {
+            window.location.href = "index.html";
+        }
+    });
+
+    var typingTimeout;
+    socket.on("typing", function(data) {
+        if (data.pseudo !== myPseudo) {
+            afficherIndicateurEcriture();
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(cacherIndicateurEcriture, 2000);
+        }
+    });
+
+    async function loadHistory() {
+        var messagesKey = "halyo_messages_" + roomId;
+        
+        // Charger les messages sauvegardés depuis localStorage
+        var savedMessages = localStorage.getItem(messagesKey);
+        if (savedMessages) {
+            var localMsgs = JSON.parse(savedMessages);
+            if (localMsgs.length > 0) {
+                var welcome = messagesContainer.querySelector(".welcome-message");
+                if (welcome) welcome.remove();
+                
+                localMsgs.forEach(function(m) {
+                    afficherMessage(m.pseudo, m.content, m.created_at);
+                });
+            }
+        }
+
+        try {
+            var res = await fetch(API_BASE + "/messages/" + roomId, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            var msgs = await res.json();
+
+            if (msgs.length > 0) {
+                var welcome = messagesContainer.querySelector(".welcome-message");
+                if (welcome) welcome.remove();
+            }
+
+            // Sauvegarder les messages du serveur dans localStorage
+            localStorage.setItem(messagesKey, JSON.stringify(msgs));
+
+            msgs.forEach(function(m) {
+                afficherMessage(m.pseudo, m.content, m.created_at);
+            });
+
+        } catch (err) {
+            console.error("Erreur chargement historique :", err);
+        }
     }
-});
 
+    window.envoyerMessage = function() {
+        var content = messageInput.value.trim();
+        if (!content || content.length > 1000) return;
 
-async function loadHistory() {
-    try {
-        const res = await fetch(`${API_BASE}/messages/${roomId}`, {
-            headers: { "Authorization": `Bearer ${token}` }
+        socket.emit("message", {
+            room_id: roomId,
+            token: token,
+            content: content
         });
 
-        if (res.status === 401 || res.status === 403) {
-            window.location.href = "index.html";
-            return;
-        }
+        messageInput.value = "";
+        messageInput.style.height = "auto";
+    };
 
-        const msgs = await res.json();
+    function afficherMessage(pseudo, content, createdAt) {
+        var welcome = messagesContainer.querySelector(".welcome-message");
+        if (welcome) welcome.remove();
 
-        // Supprime le message de bienvenue si l'historique n'est pas vide
-        if (msgs.length > 0) {
-            const welcome = messagesContainer.querySelector(".welcome-message");
-            if (welcome) welcome.remove();
-        }
+        var isMine = pseudo === myPseudo;
+        var date = new Date(createdAt);
+        var heure = date.toLocaleTimeString("fr-FR", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
 
-        msgs.forEach(m => afficherMessage(m.pseudo, m.content, m.created_at));
+        var div = document.createElement("div");
+        div.className = "message " + (isMine ? "sent" : "received");
+        div.innerHTML = "<div class=\"message-bubble\"><p class=\"message-content\">" + escapeHtml(content) + "</p><span class=\"message-time\">" + heure + "</span></div>";
 
-    } catch (err) {
-        console.error("Erreur chargement historique :", err);
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Sauvegarder le message dans localStorage
+        var messagesKey = "halyo_messages_" + roomId;
+        var savedMessages = localStorage.getItem(messagesKey);
+        var messages = savedMessages ? JSON.parse(savedMessages) : [];
+        messages.push({ pseudo: pseudo, content: content, created_at: createdAt });
+        localStorage.setItem(messagesKey, JSON.stringify(messages));
     }
-}
 
+    function afficherStatut(texte) {
+        var div = document.createElement("div");
+        div.className = "status-message";
+        div.textContent = texte;
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 
-function envoyerMessage() {
-    const content = messageInput.value.trim();
-    if (!content || content.length > 1000) return;
+    window.afficherIndicateurEcriture = function() {
+        typingIndicator.style.display = "flex";
+    };
 
-    socket.emit("message", {
-        room_id: roomId,
-        token:   token,
-        content: content,
-    });
+    window.cacherIndicateurEcriture = function() {
+        typingIndicator.style.display = "none";
+    };
 
-    messageInput.value = "";
-    messageInput.style.height = "auto";
-}
+    function escapeHtml(text) {
+        var div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-
-function afficherMessage(pseudo, content, createdAt) {
-    // Supprime le message de bienvenue au premier message reçu
-    const welcome = messagesContainer.querySelector(".welcome-message");
-    if (welcome) welcome.remove();
-
-    const isMine = pseudo === myPseudo;
-    const heure  = new Date(createdAt).toLocaleTimeString("fr-FR", {
-        hour: "2-digit", minute: "2-digit"
-    });
-
-    const div = document.createElement("div");
-    div.className = `message ${isMine ? "message-mine" : "message-theirs"}`;
-    div.innerHTML = `
-        <div class="message-bubble">
-            <p class="message-content">${escapeHtml(content)}</p>
-            <span class="message-time">${heure}</span>
-        </div>
-    `;
-
-    messagesContainer.appendChild(div);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-
-function afficherStatut(texte) {
-    const div = document.createElement("div");
-    div.className   = "status-message";
-    div.textContent = texte;
-    messagesContainer.appendChild(div);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-
-function afficherIndicateurEcriture() {
-    typingIndicator.style.display = "flex";
-}
-
-function cacherIndicateurEcriture() {
-    typingIndicator.style.display = "none";
-}
-
-
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-}
-
-
-// Soumission du formulaire
-document.getElementById("messageForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    envoyerMessage();
-});
-
-// Envoi avec Entrée, retour à la ligne avec Shift+Entrée
-messageInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    document.getElementById("messageForm").addEventListener("submit", function(e) {
         e.preventDefault();
-        envoyerMessage();
-    }
-});
+        window.envoyerMessage();
+    });
 
-// Indicateur de frappe envoyé au partenaire
-messageInput.addEventListener("input", () => {
-    // Ajustement automatique de la hauteur du textarea
-    messageInput.style.height = "auto";
-    messageInput.style.height = messageInput.scrollHeight + "px";
+    messageInput.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            window.envoyerMessage();
+        }
+    });
 
-    socket.emit("typing", { room_id: roomId, pseudo: myPseudo });
-});
+    messageInput.addEventListener("input", function() {
+        messageInput.style.height = "auto";
+        messageInput.style.height = messageInput.scrollHeight + "px";
 
-// Bouton fin de conversation
-document.getElementById("endChatBtn").addEventListener("click", () => {
-    socket.emit("leave", { room_id: roomId, token: token });
-    window.location.href = "index.html";
-});
+        socket.emit("typing", { room_id: roomId, pseudo: myPseudo });
+    });
+
+    document.getElementById("endChatBtn").addEventListener("click", function() {
+        socket.emit("leave", { room_id: roomId, token: token });
+        window.location.href = "index.html";
+    });
+})();

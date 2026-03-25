@@ -39,8 +39,36 @@
                 <span>Commencer</span>
                 <div class="button-glow"></div>
             </button>
+            
+            <!-- Bouton pour récupérer avec code -->
+            <button class="secondary-button" id="recoverBtn">
+                <span>J'ai déjà un code</span>
+            </button>
         </div>
     </main>
+    
+    <!-- Modal de récupération -->
+    <div class="recover-modal" id="recoverModal">
+        <div class="recover-content">
+            <button class="close-modal" id="closeRecoverBtn">&times;</button>
+            <h2>Retrouver mes messages</h2>
+            <p>Entre ton code de récupération pour accéder à tes conversations</p>
+            <form id="recoverForm">
+                <input 
+                    type="text" 
+                    id="recoveryCodeInput" 
+                    placeholder="XXXXXX" 
+                    maxlength="8"
+                    required
+                >
+                <button type="submit" class="submit-recover">
+                    <span>Retrouver</span>
+                    <div class="button-glow"></div>
+                </button>
+            </form>
+            <div class="recover-error" id="recoverError"></div>
+        </div>
+    </div>
     
     <script src="/static/home.js"></script>
 </body>

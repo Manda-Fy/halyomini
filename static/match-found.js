@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const toastNotification = document.getElementById('toastNotification');
     const chatNowBtn      = document.getElementById('chatNowBtn');
     const talkToAiBtn     = document.getElementById('talkToAiBtn');
+    const recoveryCodeSection = document.getElementById('recoveryCodeSection');
+    const recoveryCodeDisplay = document.getElementById('recoveryCodeDisplay');
+    const copyCodeBtn     = document.getElementById('copyCodeBtn');
 
     // Récupère les données du matching depuis l'URL
     const params      = new URLSearchParams(window.location.search);
@@ -13,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const token       = params.get("token");
     const roomId      = params.get("room_id");
     const yourPseudo  = params.get("your_pseudo");
+    const recoveryCode = localStorage.getItem('halyo_recovery_code');
 
     // Sauvegarde le token en session pour le chat
     if (token) sessionStorage.setItem("halyo_token", token);
@@ -45,6 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
             actionButtons.style.display   = 'flex';
             actionButtons.style.opacity   = '0';
             actionButtons.style.animation = 'fadeInUp 0.6s ease-out forwards';
+            
+            // Afficher le code de récupération
+            if (recoveryCode) {
+                setTimeout(() => {
+                    recoveryCodeSection.style.display = 'block';
+                    recoveryCodeSection.style.opacity = '0';
+                    recoveryCodeSection.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                    recoveryCodeDisplay.textContent = recoveryCode;
+                }, 300);
+            }
         }, 400);
     }, acceptDelay);
 
@@ -62,6 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
     talkToAiBtn.addEventListener('click', () => {
         localStorage.setItem('halyo_chat_type', 'ai');
         transitionToChat('chat.html');
+    });
+
+    // Fonction pour copier le code
+    copyCodeBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(recoveryCode).then(() => {
+            copyCodeBtn.textContent = 'Copié!';
+            setTimeout(() => {
+                copyCodeBtn.textContent = 'Copier le code';
+            }, 2000);
+        });
     });
 
     function transitionToChat(url) {
