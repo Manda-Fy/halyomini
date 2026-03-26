@@ -10,12 +10,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Récupère les données du matching depuis l'URL
     const params      = new URLSearchParams(window.location.search);
-    const score       = params.get("score");
-    const matchPseudo = params.get("match_pseudo");
-    const matchPreview = params.get("match_preview");
-    const token       = params.get("token");
-    const roomId      = params.get("room_id");
-    const yourPseudo  = params.get("your_pseudo");
+    let score       = params.get("score");
+    let matchPseudo = params.get("match_pseudo");
+    let matchPreview = params.get("match_preview");
+    let token       = params.get("token");
+    let roomId      = params.get("room_id");
+    let yourPseudo  = params.get("your_pseudo");
+    
+    // Récupérer depuis sessionStorage si pas en URL params (fallback)
+    if (!roomId) roomId = sessionStorage.getItem('halyo_room_id');
+    if (!yourPseudo) yourPseudo = sessionStorage.getItem('halyo_your_pseudo');
+    if (!matchPseudo) matchPseudo = sessionStorage.getItem('halyo_match_pseudo');
+    if (!token) token = sessionStorage.getItem('halyo_token') || localStorage.getItem('halyo_token');
+    
+    console.log("Match-found.js initialization:", {
+        score: score,
+        matchPseudo: matchPseudo,
+        roomId: roomId,
+        yourPseudo: yourPseudo,
+        token: token ? "present" : "missing"
+    });
     
     // Récupère le code de récupération depuis localStorage ou l'URL
     let recoveryCode = localStorage.getItem('halyo_recovery_code');
@@ -28,12 +42,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (token) {
         sessionStorage.setItem("halyo_token", token);
     } else {
-        // Essayer de récupérer depuis localStorage si pas en session
-        var storedToken = localStorage.getItem("halyo_token");
-        if (storedToken) {
-            token = storedToken;
-            sessionStorage.setItem("halyo_token", token);
-        }
+        // Essayer de récupérer depuis localStorage ou sessionStorage
+        token = sessionStorage.getItem("halyo_token") || localStorage.getItem("halyo_token");
+    }
+    
+    // Sauvegarder aussi matchPseudo en sessionStorage pour le chat
+    if (matchPseudo) {
+        sessionStorage.setItem("halyo_match_pseudo", matchPseudo);
+    }
+    if (yourPseudo) {
+        sessionStorage.setItem("halyo_your_pseudo", yourPseudo);
+    }
+    if (roomId) {
+        sessionStorage.setItem("halyo_room_id", roomId);
     }
 
     // Met à jour les éléments d'affichage si ils existent dans ton HTML
@@ -79,6 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Redirection vers le chat avec un humain
     chatNowBtn.addEventListener('click', () => {
+        // Assurer que toutes les données sont en sessionStorage
+        if (roomId) sessionStorage.setItem("halyo_room_id", roomId);
+        if (yourPseudo) sessionStorage.setItem("halyo_your_pseudo", yourPseudo);
+        if (matchPseudo) sessionStorage.setItem("halyo_match_pseudo", matchPseudo);
+        if (token) sessionStorage.setItem("halyo_token", token);
+        
         const chatParams = new URLSearchParams({
             room_id:      roomId,
             your_pseudo:  yourPseudo,

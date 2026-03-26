@@ -131,27 +131,32 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Ajouter l'événement au bouton
         document.getElementById('goToChatBtn').addEventListener('click', () => {
-            // Récupérer le token depuis localStorage ou sessionStorage
-            let token = sessionStorage.getItem('halyo_token') || localStorage.getItem('halyo_token');
+            // Stocker les données en sessionStorage plutôt que en URL
+            sessionStorage.setItem('halyo_room_id', matchData.room_id);
+            sessionStorage.setItem('halyo_your_pseudo', matchData.your_pseudo);
+            sessionStorage.setItem('halyo_match_pseudo', matchData.match.pseudo);
+            sessionStorage.setItem('halyo_token', matchData.token);
             
             const chatParams = new URLSearchParams({
                 room_id: matchData.room_id,
                 your_pseudo: matchData.your_pseudo,
-                match_pseudo: matchData.match.pseudo,
-                token: token || ''
+                match_pseudo: matchData.match.pseudo
             });
             window.location.href = `/match-found?${chatParams}`;
         });
         
         // Redirection automatique après 5 secondes
         setTimeout(() => {
-            let token = sessionStorage.getItem('halyo_token') || localStorage.getItem('halyo_token');
+            // Stocker les données en sessionStorage
+            sessionStorage.setItem('halyo_room_id', matchData.room_id);
+            sessionStorage.setItem('halyo_your_pseudo', matchData.your_pseudo);
+            sessionStorage.setItem('halyo_match_pseudo', matchData.match.pseudo);
+            sessionStorage.setItem('halyo_token', matchData.token);
             
             const chatParams = new URLSearchParams({
                 room_id: matchData.room_id,
                 your_pseudo: matchData.your_pseudo,
-                match_pseudo: matchData.match.pseudo,
-                token: token || ''
+                match_pseudo: matchData.match.pseudo
             });
             window.location.href = `/match-found?${chatParams}`;
         }, 5000);

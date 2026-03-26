@@ -19,7 +19,20 @@ var socket;
     roomId = params.get("room_id");
     myPseudo = params.get("your_pseudo");
     matchPseudo = params.get("match_pseudo");
-    token = sessionStorage.getItem("halyo_token");
+    token = params.get("token") || sessionStorage.getItem("halyo_token");
+    
+    // Récupérer depuis sessionStorage si pas en URL params
+    if (!roomId) roomId = sessionStorage.getItem("halyo_room_id");
+    if (!myPseudo) myPseudo = sessionStorage.getItem("halyo_your_pseudo");
+    if (!matchPseudo) matchPseudo = sessionStorage.getItem("halyo_match_pseudo");
+    
+    // Debug logs améliorés
+    console.log("Chat.js initialization:", {
+        roomId: roomId,
+        myPseudo: myPseudo,
+        matchPseudo: matchPseudo,
+        token: token ? "present" : "missing"
+    });
     
     // Sauvegarder les infos de conversation dans localStorage
     var conversationKey = "halyo_conv_" + roomId;
@@ -31,11 +44,17 @@ var socket;
     }));
 
     if (!token || !roomId || !myPseudo) {
+        console.error("Missing required parameters:", { token: !!token, roomId: !!roomId, myPseudo: !!myPseudo });
         window.location.href = "index.html";
         return;
     }
 
-    document.getElementById("chatPartnerName").textContent = matchPseudo || "Halyo";
+    // Afficher le pseudo du partenaire avec fallback
+    var displayName = matchPseudo && matchPseudo.trim() ? matchPseudo.trim() : "Halyo";
+    if (displayName === "Utilisateur inconnu" || displayName === "utilisateur inconnue" || displayName === "Correspondant") {
+        displayName = "Correspondant anonyme";
+    }
+    document.getElementById("chatPartnerName").textContent = displayName;
     document.getElementById("statusText").textContent = "Connecte";
 
     messagesContainer = document.getElementById("messagesContainer");
@@ -45,9 +64,13 @@ var socket;
     socket = io(API_BASE);
 
     socket.on("connect", function() {
-        socket.emit("join", { room_id: roomId, token: token });
         document.getElementById("statusText").textContent = "En ligne";
-        loadHistory();
+        
+        // Charger l'historique AVANT de rejoindre pour éviter les race conditions
+        loadHistory().then(function() {
+            console.log("Historique chargé, maintenant on rejoint la room");
+            socket.emit("join", { room_id: roomId, token: token });
+        });
     });
 
     socket.on("disconnect", function() {
@@ -82,47 +105,40 @@ var socket;
     async function loadHistory() {
         var messagesKey = "halyo_messages_" + roomId;
         
-        // Charger les messages sauvegardés depuis localStorage
-        var savedMessages = localStorage.getItem(messagesKey);
-        if (savedMessages) {
-            var localMsgs = JSON.parse(savedMessages);
-            if (localMsgs.length > 0) {
-                var welcome = messagesContainer.querySelector(".welcome-message");
-                if (welcome) welcome.remove();
-                
-                localMsgs.forEach(function(m) {
-                    afficherMessage(m.pseudo, m.content, m.created_at);
-                });
-            }
-        }
-
         try {
+            console.log("Chargement de l'historique pour room:", roomId);
+            
             var res = await fetch(API_BASE + "/messages/" + roomId, {
                 headers: { "Authorization": "Bearer " + token }
             });
 
             if (res.status === 401 || res.status === 403) {
+                console.error("Accès refusé au récupérer les messages");
                 window.location.href = "index.html";
                 return;
             }
 
             var msgs = await res.json();
+            console.log("Messages reçus du serveur:", msgs.length);
 
             if (msgs.length > 0) {
                 var welcome = messagesContainer.querySelector(".welcome-message");
                 if (welcome) welcome.remove();
+                
+                // Ajouter tous les messages
+                msgs.forEach(function(m) {
+                    afficherMessage(m.pseudo, m.content, m.created_at);
+                });
+                
+                // Sauvegarder dans localStorage
+                localStorage.setItem(messagesKey, JSON.stringify(msgs));
             }
-
-            // Sauvegarder les messages du serveur dans localStorage
-            localStorage.setItem(messagesKey, JSON.stringify(msgs));
-
-            msgs.forEach(function(m) {
-                afficherMessage(m.pseudo, m.content, m.created_at);
-            });
 
         } catch (err) {
             console.error("Erreur chargement historique :", err);
         }
+        
+        return true; // Signal que loadHistory est terminé
     }
 
     window.envoyerMessage = function() {
@@ -140,6 +156,11 @@ var socket;
     };
 
     function afficherMessage(pseudo, content, createdAt) {
+        if (!pseudo || !content) {
+            console.warn("Message ignoré - pseudo ou content vide", {pseudo, content});
+            return;
+        }
+
         var welcome = messagesContainer.querySelector(".welcome-message");
         if (welcome) welcome.remove();
 
@@ -148,6 +169,15 @@ var socket;
         var heure = date.toLocaleTimeString("fr-FR", {
             hour: "2-digit",
             minute: "2-digit"
+        });
+
+        // Debug log
+        console.log("Message affiché:", {
+            pseudo: pseudo,
+            myPseudo: myPseudo,
+            isMine: isMine,
+            messageClass: isMine ? "sent" : "received",
+            preview: content.substring(0, 30)
         });
 
         var div = document.createElement("div");
