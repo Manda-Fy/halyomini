@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 score: data.score,
                 id:    data.new_profile_id,
                 token: data.token,
+                recovery_code: data.recovery_code || '',
             });
 
             setTimeout(() => {

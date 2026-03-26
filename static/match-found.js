@@ -16,10 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const token       = params.get("token");
     const roomId      = params.get("room_id");
     const yourPseudo  = params.get("your_pseudo");
-    const recoveryCode = localStorage.getItem('halyo_recovery_code');
+    
+    // Récupère le code de récupération depuis localStorage ou l'URL
+    let recoveryCode = localStorage.getItem('halyo_recovery_code');
+    if (!recoveryCode && params.get('recovery_code')) {
+        recoveryCode = params.get('recovery_code');
+        localStorage.setItem('halyo_recovery_code', recoveryCode);
+    }
 
     // Sauvegarde le token en session pour le chat
-    if (token) sessionStorage.setItem("halyo_token", token);
+    if (token) {
+        sessionStorage.setItem("halyo_token", token);
+    } else {
+        // Essayer de récupérer depuis localStorage si pas en session
+        var storedToken = localStorage.getItem("halyo_token");
+        if (storedToken) {
+            token = storedToken;
+            sessionStorage.setItem("halyo_token", token);
+        }
+    }
 
     // Met à jour les éléments d'affichage si ils existent dans ton HTML
     if (score        && document.getElementById("score-text"))

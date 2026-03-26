@@ -20,7 +20,7 @@ var socket;
     myPseudo = params.get("your_pseudo");
     matchPseudo = params.get("match_pseudo");
     token = sessionStorage.getItem("halyo_token");
-
+    
     // Sauvegarder les infos de conversation dans localStorage
     var conversationKey = "halyo_conv_" + roomId;
     localStorage.setItem(conversationKey, JSON.stringify({
@@ -143,7 +143,7 @@ var socket;
         var welcome = messagesContainer.querySelector(".welcome-message");
         if (welcome) welcome.remove();
 
-        var isMine = pseudo === myPseudo;
+        var isMine = pseudo && myPseudo && pseudo.trim().toLowerCase() === myPseudo.trim().toLowerCase();
         var date = new Date(createdAt);
         var heure = date.toLocaleTimeString("fr-FR", {
             hour: "2-digit",

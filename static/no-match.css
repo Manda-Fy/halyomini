@@ -303,6 +303,55 @@ body {
     line-height: 1.6;
 }
 
+/* Section du code de récupération */
+.recovery-code-section {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 126, 185, 0.08);
+    border: 1px solid rgba(255, 126, 185, 0.3);
+    border-radius: 16px;
+}
+
+.recovery-info {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+.recovery-code {
+    font-family: 'Courier New', monospace;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff7eb9;
+    letter-spacing: 0.3em;
+    padding: 1rem;
+    background: rgba(26, 26, 46, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 126, 185, 0.3);
+    text-shadow: 0 0 20px rgba(255, 126, 185, 0.5);
+}
+
+.copy-code-btn {
+    margin-top: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ffffff;
+    background: rgba(255, 126, 185, 0.2);
+    border: 1px solid rgba(255, 126, 185, 0.4);
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.copy-code-btn:hover {
+    background: rgba(255, 126, 185, 0.35);
+    border-color: rgba(255, 126, 185, 0.6);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     body {
